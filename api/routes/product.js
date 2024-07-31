@@ -22,6 +22,8 @@ router.get('/',(req,res,next)=>{
     }
     )
 });
+
+
 router.post('/',checkauth,(req,res,next)=>{
     console.log('Request body:', req.body);
     const product=ProductModel({

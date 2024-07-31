@@ -5,9 +5,27 @@ const mongoose=require('mongoose');
 const bcrypt=require('bcrypt'); 
 const jwt=require('jsonwebtoken')
 
+router.get('/', (req, res, next) => {
+    console.log('get user');
+    userModel.find().exec().then(
+        docs => {
+            if (docs.length > 0) {
+                const response = {
+                    count: docs.length,
+                    products: docs
+                }
+                res.status(200).json(response);
+            } else {
+                res.status(404).json({
+                    message: "No user found"
+                });
+            }
+        }
+    )
+});
+
 
 router.post('/signup',(req,res,next)=>{
-
     userModel.find({ email:req.body.email }).then(user=>{
         if(user.length>=1){
             console.log('this is user exite message' + user);
@@ -15,11 +33,13 @@ router.post('/signup',(req,res,next)=>{
                 message:"email already exist"
             })
         }else{
-
             bcrypt.hash(req.body.password,10,(err,hash)=>{
                 if(err){
+                    console.log('data saving to the database:' + user);
                     return res.status(500).json({
-                        error:err
+                        error:{
+                            message:err
+                        }
                     })
                 }else{
             const user=userModel({
@@ -27,6 +47,7 @@ router.post('/signup',(req,res,next)=>{
                 email:req.body.email,
                 password:hash
             });
+            console.log('data saving to the database:' + user);
             user.save().then( 
                 result=>{
                     console.log('user signup to the database');
